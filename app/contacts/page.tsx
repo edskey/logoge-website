@@ -22,7 +22,7 @@ export default async function ContactsPage({ searchParams }: { searchParams: Pro
           <a href="/#web">Web</a>
           <a href="/#team">Team</a>
         </nav>
-        <a className="smm-back" href={backHref}>← Назад</a>
+        <a className="smm-back" href={backHref}><i className="ui-arrow ui-arrow-back" aria-hidden="true" /> Назад</a>
       </header>
 
       <section className="contacts-page-content">
@@ -32,7 +32,7 @@ export default async function ContactsPage({ searchParams }: { searchParams: Pro
           {selection && <p className="selected-package">Вы выбрали <strong>{selection}</strong></p>}
         </div>
         <div className="contacts-page-actions">
-          <a className="contacts-primary" href={whatsapp} target="_blank" rel="noreferrer">Написать в WhatsApp <span>↗</span></a>
+          <a className="contacts-primary" href={whatsapp} target="_blank" rel="noreferrer">Написать в WhatsApp <span className="ui-arrow" aria-hidden="true" /></a>
           <a href="tel:+995550001182">+995 550 00 11 82</a>
           <a href="mailto:info.logoge@gmail.com">info.logoge@gmail.com</a>
           <p>Vazisubani 2/10 · Tbilisi</p>

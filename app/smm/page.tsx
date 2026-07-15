@@ -23,7 +23,7 @@ export default function SmmDetailsPage() {
           <a href="/#web">Web</a>
           <a href="/#team">Team</a>
         </nav>
-        <a className="smm-back" href="/#smm">← Назад</a>
+        <a className="smm-back" href="/#smm"><i className="ui-arrow ui-arrow-back" aria-hidden="true" /> Назад</a>
       </header>
 
       <div className="smm-detail-kicker">SMM пакеты</div>
@@ -46,7 +46,7 @@ export default function SmmDetailsPage() {
               <header>
                 <small>{plan.subtitle}</small>
                 <h2>{plan.name}</h2>
-                <span>Выбрать ↗</span>
+                <span>Выбрать <i className="ui-arrow" aria-hidden="true" /></span>
               </header>
               <ul>
                 {smmFeatures.map((feature) => (
@@ -56,7 +56,7 @@ export default function SmmDetailsPage() {
                   </li>
                 ))}
               </ul>
-              <footer>Перейти к заявке <b>↗</b></footer>
+              <footer>Перейти к заявке <b><i className="ui-arrow" aria-hidden="true" /></b></footer>
             </a>
           ))}
         </div>

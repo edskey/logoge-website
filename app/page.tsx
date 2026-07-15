@@ -178,8 +178,8 @@ export default function Home() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [utilityScene, setUtilityScene] = useState<"about" | "contacts" | null>(null);
   const wheelLocked = useRef(false);
+  const touchStartX = useRef(0);
   const touchStartY = useRef(0);
-  const touchIgnored = useRef(false);
   const teamGalleryRef = useRef<HTMLDivElement>(null);
   const active = utilityScene ?? slideIds[activeIndex];
   const sceneClass = (id: string, classes: string) => {
@@ -270,7 +270,7 @@ export default function Home() {
       window.setTimeout(() => { wheelLocked.current = false; }, 900);
     };
     const onWheel = (event: WheelEvent) => {
-      const scrollArea = event.target instanceof Element ? event.target.closest<HTMLElement>(".package-grid, .smm-comparison") : null;
+      const scrollArea = event.target instanceof Element ? event.target.closest<HTMLElement>(".smm-comparison") : null;
       if (scrollArea && scrollArea.scrollHeight > scrollArea.clientHeight) {
         const canScrollDown = event.deltaY > 0 && scrollArea.scrollTop + scrollArea.clientHeight < scrollArea.scrollHeight - 2;
         const canScrollUp = event.deltaY < 0 && scrollArea.scrollTop > 2;
@@ -286,14 +286,17 @@ export default function Home() {
       if (event.key === "Escape" && utilityScene) setUtilityScene(null);
     };
     const onTouchStart = (event: TouchEvent) => {
+      touchStartX.current = event.touches[0]?.clientX ?? 0;
       touchStartY.current = event.touches[0]?.clientY ?? 0;
-      touchIgnored.current = event.target instanceof Element && Boolean(event.target.closest(".package-grid, .smm-comparison"));
     };
     const onTouchEnd = (event: TouchEvent) => {
-      if (touchIgnored.current) return;
+      const endX = event.changedTouches[0]?.clientX ?? touchStartX.current;
       const endY = event.changedTouches[0]?.clientY ?? touchStartY.current;
-      const distance = touchStartY.current - endY;
-      if (Math.abs(distance) > 45) changeSlide(distance > 0 ? 1 : -1);
+      const distanceX = touchStartX.current - endX;
+      const distanceY = touchStartY.current - endY;
+      if (Math.abs(distanceY) > 45 && Math.abs(distanceY) > Math.abs(distanceX) * 1.15) {
+        changeSlide(distanceY > 0 ? 1 : -1);
+      }
     };
     window.addEventListener("wheel", onWheel, { passive: false });
     window.addEventListener("keydown", onKey);
@@ -402,7 +405,7 @@ export default function Home() {
         </p>
         <button className="scroll-cue" onClick={() => goTo("branding")}>
           <span>Прокрутите</span>
-          <b>↓</b>
+          <b><i className="ui-arrow ui-arrow-down" aria-hidden="true" /></b>
         </button>
         <div className="hero-counter">01 / 07</div>
       </section>
@@ -428,7 +431,7 @@ export default function Home() {
         </div>
         <p className="brand-side-note" aria-hidden="true">LOGO · COLOR · TYPE · FORM</p>
         <SectionObject type="magazine" />
-        <a className="round-cta brand-cta magnetic" href={whatsapp} target="_blank" rel="noreferrer">Обсудить<br />бренд ↗</a>
+        <a className="round-cta brand-cta magnetic" href={whatsapp} target="_blank" rel="noreferrer"><span>Обсудить<br />бренд</span><i className="ui-arrow" aria-hidden="true" /></a>
       </section>
 
       <section className={sceneClass("smm", "service-scene smm")} id="smm">
@@ -457,7 +460,7 @@ export default function Home() {
         <PackageCards items={academyPackages} service="Academy" />
         <p className="academy-principle" aria-hidden="true"><span>01</span> Практика <i /> <span>02</span> Система <i /> <span>03</span> Результат</p>
         <SectionObject type="cap" />
-        <a className="text-cta academy-cta" href="/academy/apply">Оставить заявку на обучение <b>↗</b></a>
+        <a className="text-cta academy-cta" href="/academy/apply">Оставить заявку на обучение <b><i className="ui-arrow" aria-hidden="true" /></b></a>
       </section>
 
       <section className={sceneClass("event-reels", "service-scene event")} id="event-reels">
@@ -538,7 +541,7 @@ export default function Home() {
             <p className="eyebrow">Контакты · LOGOGE</p>
             <h2>Обсудим<br /><em>вашу идею.</em></h2>
             <p className="contact-note">Расскажите о задаче — мы предложим подходящий формат работы.</p>
-            <a className="contact-button magnetic" href={whatsapp} target="_blank" rel="noreferrer">Написать в WhatsApp <span>↗</span></a>
+            <a className="contact-button magnetic" href={whatsapp} target="_blank" rel="noreferrer">Написать в WhatsApp <span className="ui-arrow" aria-hidden="true" /></a>
             <div className="contact-details">
               <a href="tel:+995550001182"><small>Телефон</small><span>+995 550 00 11 82</span></a>
               <a href="mailto:info.logoge@gmail.com"><small>Email</small><span>info.logoge@gmail.com</span></a>

@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "LOGOGE — Там, где идея становится брендом",
   description: "Брендинг, SMM, обучение, Event Reels и создание сайтов в Грузии.",
-  icons: { icon: "/favicon.svg", shortcut: "/favicon.svg" },
+  icons: { icon: "/assets/logoge-mark-exact.png", shortcut: "/assets/logoge-mark-exact.png" },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

@@ -30,7 +30,7 @@ export default function AcademyApplyPage() {
           <a href="/#web">Web</a>
           <a href="/#team">Team</a>
         </nav>
-        <a className="smm-back" href="/#academy">← Назад</a>
+        <a className="smm-back" href="/#academy"><i className="ui-arrow ui-arrow-back" aria-hidden="true" /> Назад</a>
       </header>
 
       <section className="academy-apply-content">
@@ -54,7 +54,7 @@ export default function AcademyApplyPage() {
             <span><small>02</small> Номер телефона</span>
             <input type="tel" name="phone" autoComplete="tel" inputMode="tel" placeholder="+995 5XX XX XX XX" value={phone} onChange={(event) => setPhone(event.target.value)} required />
           </label>
-          <button type="submit"><span>Отправить заявку</span><b>↗</b></button>
+          <button type="submit"><span>Отправить заявку</span><b><i className="ui-arrow" aria-hidden="true" /></b></button>
           <p>После нажатия откроется WhatsApp с уже заполненной заявкой.</p>
         </form>
       </section>
