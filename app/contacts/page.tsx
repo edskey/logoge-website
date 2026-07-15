@@ -1,4 +1,12 @@
+import type { Metadata } from "next";
+
 const whatsappBase = "https://wa.me/995550001182";
+
+export const metadata: Metadata = {
+  title: "Контакты | LOGOGE",
+  description: "Свяжитесь с LOGOGE, чтобы обсудить брендинг, SMM, обучение, Event Reels или сайт.",
+  alternates: { canonical: "/contacts" },
+};
 
 export default async function ContactsPage({ searchParams }: { searchParams: Promise<{ package?: string; service?: string }> }) {
   const params = await searchParams;

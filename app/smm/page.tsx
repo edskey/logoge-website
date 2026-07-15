@@ -1,4 +1,11 @@
 import { smmFeatures } from "../smm-data";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "SMM-пакеты | LOGOGE",
+  description: "Пакеты SMM-сопровождения LOGOGE: Start, Business и Premium.",
+  alternates: { canonical: "/smm" },
+};
 
 const plans = [
   { name: "Start", subtitle: "Базовое ведение", tone: "start", valueIndex: 1 as const },

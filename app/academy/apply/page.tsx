@@ -7,6 +7,7 @@ const whatsappBase = "https://wa.me/995550001182";
 export default function AcademyApplyPage() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [consent, setConsent] = useState(false);
 
   const submitApplication = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -53,6 +54,10 @@ export default function AcademyApplyPage() {
           <label>
             <span><small>02</small> Номер телефона</span>
             <input type="tel" name="phone" autoComplete="tel" inputMode="tel" placeholder="+995 5XX XX XX XX" value={phone} onChange={(event) => setPhone(event.target.value)} required />
+          </label>
+          <label className="form-consent">
+            <input type="checkbox" name="privacy-consent" checked={consent} onChange={(event) => setConsent(event.target.checked)} required />
+            <span>Я согласен(на) на обработку моих данных для ответа на заявку согласно <a href="/privacy" target="_blank" rel="noreferrer">Политике конфиденциальности</a>. После отправки данные будут переданы в WhatsApp.</span>
           </label>
           <button type="submit"><span>Отправить заявку</span><b><i className="ui-arrow" aria-hidden="true" /></b></button>
           <p>После нажатия откроется WhatsApp с уже заполненной заявкой.</p>

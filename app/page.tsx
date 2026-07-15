@@ -111,6 +111,34 @@ const dockItems = [
   { id: "team", label: "Team", icon: "team" },
 ];
 
+function HeroVideo({ src, className, poster }: { src: string; className: string; poster?: string }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.defaultMuted = true;
+    video.muted = true;
+    void video.play().catch(() => undefined);
+  }, []);
+
+  return (
+    <video
+      className={className}
+      ref={videoRef}
+      autoPlay
+      loop
+      muted
+      playsInline
+      preload="auto"
+      poster={poster}
+      disablePictureInPicture
+    >
+      <source src={src} type="video/mp4" />
+    </video>
+  );
+}
+
 function CrossfadeVideo({ src, className, poster }: { src: string; className: string; poster?: string }) {
   const videos = useRef<(HTMLVideoElement | null)[]>([]);
   const activeLayerRef = useRef(0);
@@ -208,7 +236,7 @@ export default function Home() {
     if (menuOpen || utilityScene) return;
     const timer = window.setTimeout(() => {
       setActiveIndex((current) => (current + 1) % slideIds.length);
-    }, 7000);
+    }, activeIndex === 0 ? 9000 : 7000);
     return () => window.clearTimeout(timer);
   }, [activeIndex, menuOpen, utilityScene]);
 
@@ -381,6 +409,11 @@ export default function Home() {
               {label}
             </button>
           ))}
+          <div className="menu-legal" aria-label="Юридическая информация">
+            <a href="/privacy">Политика конфиденциальности</a>
+            <a href="/cookies">Политика Cookie</a>
+            <a href="/terms">Пользовательское соглашение</a>
+          </div>
         </div>
         <div className="menu-meta">
           <span>RU · GE · EN</span>
@@ -389,7 +422,7 @@ export default function Home() {
 
       <section className={sceneClass("intro", "hero")} id="intro">
         <div className="hero-art" aria-hidden="true">
-          <CrossfadeVideo src="/assets/hero-video-3.mp4" className="hero-video loop-video" poster="/assets/hero-hq.png" />
+          <HeroVideo src="/assets/hero-video-3.mp4" className="hero-video" poster="/assets/hero-hq.png" />
           <div className="liquid liquid-one" />
           <div className="liquid liquid-two" />
           <div className="halo" />
