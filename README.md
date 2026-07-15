@@ -9,7 +9,7 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:3000`.
+Open `http://localhost:3000`. If the port is occupied, run `npm run dev -- --port 3001` and open `http://localhost:3001`.
 
 ## Production
 

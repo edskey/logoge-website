@@ -23,22 +23,10 @@ const smmPackages = [
   ["Premium", "Полное маркетинговое сопровождение бренда."],
 ];
 
-const academyPackages = [
-  ["Start", "Основы SMM, контент-план, мобильная съёмка и монтаж Reels."],
-  ["Pro", "Стратегия, продающий контент, таргетинг, аналитика и практика."],
-  ["Mentorship", "Индивидуальная программа, консультации и сопровождение проекта."],
-];
-
 const eventPackages = [
   ["Essential", "3 Reels", "Ключевые моменты события в лаконичной серии."],
   ["Story", "5 Reels", "Развёрнутая история события с разными сценариями."],
   ["Full Event", "8 Reels", "Полное контент-сопровождение и максимум атмосферы."],
-];
-
-const webPackages = [
-  ["Landing", "Одностраничный сайт для услуги, продукта или кампании."],
-  ["Business", "Многостраничный сайт с услугами, кейсами и заявками."],
-  ["Custom", "Интерактивный сайт с анимациями, языками и интеграциями."],
 ];
 
 function PackageCards({ items, service, destination }: { items: string[][]; service: string; destination?: string }) {
@@ -490,8 +478,11 @@ export default function Home() {
           <h2>Academy</h2>
           <p>Практические знания для самостоятельного создания контента и продвижения брендов.</p>
         </div>
-        <PackageCards items={academyPackages} service="Academy" />
-        <p className="academy-principle" aria-hidden="true"><span>01</span> Практика <i /> <span>02</span> Система <i /> <span>03</span> Результат</p>
+        <div className="academy-focus" aria-label="Принципы Academy">
+          <span><small>01</small> Практика</span>
+          <span><small>02</small> Система</span>
+          <span><small>03</small> Результат</span>
+        </div>
         <SectionObject type="cap" />
         <a className="text-cta academy-cta" href="/academy/apply">Оставить заявку на обучение <b><i className="ui-arrow" aria-hidden="true" /></b></a>
       </section>
@@ -517,8 +508,8 @@ export default function Home() {
           <h2>Web<br />Development</h2>
           <p>Сайты с характером бренда — выразительные, быстрые и удобные на любом экране.</p>
         </div>
-        <PackageCards items={webPackages} service="Web Development" />
         <SectionObject type="laptop" />
+        <a className="web-cta magnetic" href="/contacts?service=Web%20Development">Начни<br />свой проект <b><i className="ui-arrow" aria-hidden="true" /></b></a>
       </section>
 
       <section className={sceneClass("team", "service-scene team")} id="team">
