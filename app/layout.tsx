@@ -4,7 +4,6 @@ import { CookieConsent } from "./components/cookie-consent";
 import { siteName, siteUrl } from "./site";
 import { translations } from "./i18n";
 import { LanguageProvider } from "./i18n-client";
-import { WhatsAppSupport } from "./components/whatsapp-support";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -36,7 +35,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <link rel="preload" href="/assets/hero-video-3-mobile.mp4" as="video" type="video/mp4" media="(max-width: 899px)" />
         <link rel="preload" href="/assets/hero-video-3.mp4" as="video" type="video/mp4" media="(min-width: 900px)" />
       </head>
-      <body><LanguageProvider initialLocale="ka">{children}<WhatsAppSupport /><CookieConsent /></LanguageProvider></body>
+      <body><LanguageProvider initialLocale="ka">{children}<CookieConsent /></LanguageProvider></body>
     </html>
   );
 }

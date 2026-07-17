@@ -143,9 +143,6 @@ main { position: relative; width: 100vw; height: 100svh; overflow: hidden; }
 .loop-video { opacity: 0; transition: opacity 1.45s ease-in-out; pointer-events: none; }
 .loop-video.is-visible { opacity: 1; }
 .hero-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; filter: saturate(.72) sepia(.08) contrast(1.04); transform: scale(1.2); }
-.whatsapp-support { position: fixed; z-index: 30; left: clamp(18px,2.2vw,34px); bottom: clamp(18px,3vh,30px); min-height: 42px; padding: 0 .78rem; display: inline-flex; align-items: center; gap: .48rem; color: var(--cream); background: rgba(34,20,19,.42); border: 1px solid rgba(248,245,238,.5); border-radius: 999px; box-shadow: 0 12px 30px rgba(34,20,19,.16); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); font-size: .52rem; letter-spacing: .1em; text-transform: uppercase; transition: transform .25s ease,background .25s ease,color .25s ease; }
-.whatsapp-support svg { width: 17px; height: 17px; fill: currentColor; }
-.whatsapp-support:hover { color: var(--ink); background: var(--cream); transform: translateY(-3px); }
 .hero-art::before { display: none; }
 .hero-art .liquid, .hero-art .halo, .hero-art .light-sweep { display: none; }
 .hero-art .grain { display: none; }
@@ -500,8 +497,6 @@ html:has(.we-page), body:has(.we-page) { overflow-x: hidden; overflow-y: auto; o
   .scene-dock button.is-active::before { width: 42px; height: 42px; }
   .scene-dock button small { right: 38px; font-size: .44rem; }
   .hero-video { object-position: 55% center; }
-  .whatsapp-support { left: 16px; bottom: 16px; min-height: 38px; padding: 0 .66rem; }
-  .whatsapp-support span { display: none; }
   .menu-overlay { padding: 17vh 22px 5vh; }
   .menu-overlay::before { background-position: 62% center; opacity: .32; }
   .menu-overlay::after { background: linear-gradient(90deg, rgba(248,245,238,.94), rgba(248,245,238,.7)), linear-gradient(0deg, rgba(248,245,238,.8), transparent 55%); }
