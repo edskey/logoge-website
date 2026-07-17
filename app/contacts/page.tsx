@@ -1,46 +1,52 @@
-import type { Metadata } from "next";
+"use client";
+
+import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import { LanguageSwitch } from "../components/language-switch";
+import { getTranslations, localizedPath } from "../i18n";
+import { useLocale } from "../i18n-client";
 
 const whatsappBase = "https://wa.me/995550001182";
 
-export const metadata: Metadata = {
-  title: "Контакты | LOGOGE",
-  description: "Свяжитесь с LOGOGE, чтобы обсудить брендинг, SMM, обучение, Event Reels или сайт.",
-  alternates: { canonical: "/contacts" },
-};
-
-export default async function ContactsPage({ searchParams }: { searchParams: Promise<{ package?: string; service?: string }> }) {
-  const params = await searchParams;
-  const selectedPackage = ["Start", "Business", "Premium", "Pro", "Mentorship", "Essential", "Story", "Full Event", "Landing", "Custom"].includes(params.package ?? "") ? params.package : null;
-  const selectedService = ["SMM", "Academy", "Event Reels", "Web Development"].includes(params.service ?? "") ? params.service : null;
+function ContactsContent() {
+  const params = useSearchParams();
+  const { locale } = useLocale();
+  const t = getTranslations(locale);
+  const c = t.contacts;
+  const home = localizedPath(locale);
+  const packageParam = params.get("package") ?? "";
+  const serviceParam = params.get("service") ?? "";
+  const selectedPackage = ["Start", "Business", "Premium", "Pro", "Mentorship", "Essential", "Story", "Full Event", "Landing", "Custom"].includes(packageParam) ? packageParam : null;
+  const selectedService = ["SMM", "Academy", "Event Reels", "Web Development"].includes(serviceParam) ? serviceParam : null;
   const selection = selectedPackage && selectedService ? `${selectedService} — ${selectedPackage}` : selectedPackage;
-  const backHref = selectedService === "Academy" ? "/#academy" : selectedService === "Event Reels" ? "/#event-reels" : selectedService === "Web Development" ? "/#web" : "/#smm";
+  const backHref = selectedService === "Academy" ? `${home}#academy` : selectedService === "Event Reels" ? `${home}#event-reels` : selectedService === "Web Development" ? `${home}#web` : `${home}#smm`;
   const whatsapp = selection
-    ? `${whatsappBase}?text=${encodeURIComponent(`Здравствуйте! Хочу обсудить пакет ${selection}.`)}`
-    : `${whatsappBase}?text=${encodeURIComponent("Здравствуйте! Хочу обсудить проект с LOGOGE.")}`;
+    ? `${whatsappBase}?text=${encodeURIComponent(`${c.whatsappPackage} ${selection}.`)}`
+    : `${whatsappBase}?text=${encodeURIComponent(c.whatsappProject)}`;
 
   return (
     <main className="contacts-page">
       <header className="smm-detail-header contacts-page-header">
-        <a className="smm-detail-logo" href="/"><span className="brand-mark" aria-hidden="true" /><span>LOGOGE</span></a>
-        <nav className="smm-detail-nav" aria-label="Основные разделы">
-          <a href="/#branding">Branding</a>
-          <a href="/#smm">SMM</a>
-          <a href="/#academy">Academy</a>
-          <a href="/#event-reels">Event Reels</a>
-          <a href="/#web">Web</a>
-          <a href="/#team">Team</a>
+        <a className="smm-detail-logo" href={home}><span className="brand-mark" aria-hidden="true" /><span>LOGOGE</span></a>
+        <nav className="smm-detail-nav" aria-label={c.navLabel}>
+          <a href={`${home}#branding`}>{t.common.services.branding}</a>
+          <a href={`${home}#smm`}>SMM</a>
+          <a href={`${home}#academy`}>{t.common.services.academy}</a>
+          <a href={`${home}#event-reels`}>Event Reels</a>
+          <a href={`${home}#web`}>Web</a>
+          <a href={localizedPath(locale, "/we")}>{t.common.nav.we}</a>
         </nav>
-        <a className="smm-back" href={backHref}><i className="ui-arrow ui-arrow-back" aria-hidden="true" /> Назад</a>
+        <div className="detail-header-actions"><LanguageSwitch /><a className="smm-back" href={backHref}><i className="ui-arrow ui-arrow-back" aria-hidden="true" /> {t.common.back}</a></div>
       </header>
 
       <section className="contacts-page-content">
         <div>
-          <p className="eyebrow">Начнём с идеи</p>
-          <h1>Давайте<br /><em>поговорим.</em></h1>
-          {selection && <p className="selected-package">Вы выбрали <strong>{selection}</strong></p>}
+          <p className="eyebrow">{c.eyebrow}</p>
+          <h1>{c.title}<br /><em>{c.titleAccent}</em></h1>
+          {selection && <p className="selected-package">{c.selected} <strong>{selection}</strong></p>}
         </div>
         <div className="contacts-page-actions">
-          <a className="contacts-primary" href={whatsapp} target="_blank" rel="noreferrer">Написать в WhatsApp <span className="ui-arrow" aria-hidden="true" /></a>
+          <a className="contacts-primary" href={whatsapp} target="_blank" rel="noreferrer">{c.whatsapp} <span className="ui-arrow" aria-hidden="true" /></a>
           <a href="tel:+995550001182">+995 550 00 11 82</a>
           <a href="mailto:info.logoge@gmail.com">info.logoge@gmail.com</a>
           <p>Vazisubani 2/10 · Tbilisi</p>
@@ -53,3 +59,5 @@ export default async function ContactsPage({ searchParams }: { searchParams: Pro
     </main>
   );
 }
+
+export default function ContactsPage() { return <Suspense><ContactsContent /></Suspense>; }

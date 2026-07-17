@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getTranslations, localizedPath } from "../i18n";
+import { useLocale } from "../i18n-client";
 
 type Consent = "accepted" | "rejected" | null;
 type Fbq = ((...args: unknown[]) => void) & { queue: unknown[][] };
@@ -43,6 +45,8 @@ function loadOptionalAnalytics() {
 }
 
 export function CookieConsent() {
+  const { locale } = useLocale();
+  const t = getTranslations(locale).cookiesBanner;
   const [consent, setConsent] = useState<Consent | "loading">("loading");
 
   useEffect(() => {
@@ -61,11 +65,11 @@ export function CookieConsent() {
   if (consent !== null) return null;
 
   return (
-    <aside className="cookie-banner" aria-label="Настройки cookie">
-      <p>Мы используем только необходимые технологии. Необязательная аналитика включается только с вашего согласия. Подробнее — в <a href="/cookies">Политике Cookie</a>.</p>
+    <aside className="cookie-banner" aria-label={t.label}>
+      <p>{t.text} <a href={localizedPath(locale, "/cookies")}>{t.link}</a>.</p>
       <div>
-        <button className="cookie-decline" type="button" onClick={() => save("rejected")}>Отклонить</button>
-        <button className="cookie-accept" type="button" onClick={() => save("accepted")}>Принять</button>
+        <button className="cookie-decline" type="button" onClick={() => save("rejected")}>{t.decline}</button>
+        <button className="cookie-accept" type="button" onClick={() => save("accepted")}>{t.accept}</button>
       </div>
     </aside>
   );

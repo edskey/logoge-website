@@ -2,38 +2,25 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
-
-const whatsapp =
-  "https://wa.me/995550001182?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%21%20%D0%AF%20%D0%BF%D0%BE%D1%81%D0%B5%D1%82%D0%B8%D0%BB%28%D0%B0%29%20%D1%81%D0%B0%D0%B9%D1%82%20LOGOGE%20%D0%B8%20%D1%85%D0%BE%D1%87%D1%83%20%D0%BE%D0%B1%D1%81%D1%83%D0%B4%D0%B8%D1%82%D1%8C%20%D0%BF%D1%80%D0%BE%D0%B5%D0%BA%D1%82.";
+import { LanguageSwitch } from "./components/language-switch";
+import { getTranslations, localizedPath } from "./i18n";
+import { useLocale } from "./i18n-client";
 
 const sections = [
-  { id: "branding", label: "Branding" },
+  { id: "branding", label: "Брендинг" },
   { id: "smm", label: "SMM" },
-  { id: "academy", label: "Academy" },
+  { id: "academy", label: "Академия" },
   { id: "event-reels", label: "Event Reels" },
   { id: "web", label: "Web Development" },
-  { id: "team", label: "Team" },
 ];
 
 const slideIds = ["intro", ...sections.map((section) => section.id)];
 
-const smmPackages = [
-  ["Start", "Базовое ведение и создание контента."],
-  ["Business", "Продвижение с таргетированной рекламой."],
-  ["Premium", "Полное маркетинговое сопровождение бренда."],
-];
-
-const eventPackages = [
-  ["Essential", "3 Reels", "Ключевые моменты события в лаконичной серии."],
-  ["Story", "5 Reels", "Развёрнутая история события с разными сценариями."],
-  ["Full Event", "8 Reels", "Полное контент-сопровождение и максимум атмосферы."],
-];
-
-function PackageCards({ items, service, destination }: { items: string[][]; service: string; destination?: string }) {
+function PackageCards({ items, service, destination, moreLabel, chooseLabel }: { items: readonly (readonly string[])[]; service: string; destination?: string; moreLabel: string; chooseLabel: string }) {
   return (
     <div className="package-grid">
       {items.map(([name, detail, extra], index) => (
-        <a className="package-card magnetic" href={destination ?? `/contacts?service=${encodeURIComponent(service)}&package=${encodeURIComponent(name)}`} aria-label={`${destination ? "Подробнее о" : "Выбрать"} пакет ${name} — ${service}`} key={name}>
+        <a className="package-card magnetic" href={destination ?? `/contacts?service=${encodeURIComponent(service)}&package=${encodeURIComponent(name)}`} aria-label={`${destination ? moreLabel : chooseLabel} ${name} — ${service}`} key={name}>
           <span className="card-index">0{index + 1}</span>
           <h3>{name}</h3>
           <strong>{detail}</strong>
@@ -88,16 +75,6 @@ function SectionObject({ type }: { type: "magazine" | "camera" | "cap" | "phone"
     </div>
   );
 }
-
-const dockItems = [
-  { id: "intro", label: "Начало", icon: "spark" },
-  { id: "branding", label: "Branding", icon: "magazine" },
-  { id: "smm", label: "SMM", icon: "camera" },
-  { id: "academy", label: "Academy", icon: "cap" },
-  { id: "event-reels", label: "Event Reels", icon: "phone" },
-  { id: "web", label: "Web Development", icon: "laptop" },
-  { id: "team", label: "Team", icon: "team" },
-];
 
 function HeroVideo({ src, className, poster }: { src: string; className: string; poster?: string }) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -189,14 +166,30 @@ function CrossfadeVideo({ src, className, poster }: { src: string; className: st
   );
 }
 
+const dockItems = [
+  { id: "intro", label: "Начало", icon: "spark", description: "Начало" },
+  { id: "branding", label: "Брендинг", icon: "magazine", description: "Брендинг" },
+  { id: "smm", label: "SMM", icon: "camera", description: "SMM" },
+  { id: "academy", label: "Академия", icon: "cap", description: "Академия" },
+  { id: "event-reels", label: "Event Reels", icon: "phone", description: "Event Reels" },
+  { id: "web", label: "Web Development", icon: "laptop", description: "Web Development" },
+];
+
 export default function Home() {
+  const { locale } = useLocale();
+  const t = getTranslations(locale);
+  const homePath = localizedPath(locale);
+  const pagePath = (path: string) => localizedPath(locale, path);
+  const whatsappText = locale === "ka" ? "გამარჯობა! ვესტუმრე LOGOGE-ის საიტს და მსურს პროექტის განხილვა." : locale === "en" ? "Hello! I visited the LOGOGE website and would like to discuss a project." : "Здравствуйте! Я посетил(а) сайт LOGOGE и хочу обсудить проект.";
+  const localizedWhatsapp = `https://wa.me/995550001182?text=${encodeURIComponent(whatsappText)}`;
+  const localizedDockItems = dockItems.map((item, index) => ({ ...item, label: t.home.dock[index], description: t.home.dock[index] }));
   const [menuOpen, setMenuOpen] = useState(false);
+  const [servicesOpen, setServicesOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [utilityScene, setUtilityScene] = useState<"about" | "contacts" | null>(null);
   const wheelLocked = useRef(false);
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
-  const teamGalleryRef = useRef<HTMLDivElement>(null);
   const active = utilityScene ?? slideIds[activeIndex];
   const sceneClass = (id: string, classes: string) => {
     const sceneIndex = slideIds.indexOf(id);
@@ -229,25 +222,6 @@ export default function Home() {
   }, [activeIndex, menuOpen, utilityScene]);
 
   useEffect(() => {
-    if (active !== "team") return;
-    const centerOwner = () => {
-      const gallery = teamGalleryRef.current;
-      const owner = gallery?.querySelector<HTMLElement>(".owner-card");
-      if (!gallery || !owner || window.innerWidth > 760) return;
-      gallery.scrollTo({
-        left: owner.offsetLeft - (gallery.clientWidth - owner.offsetWidth) / 2,
-        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
-      });
-    };
-    const frame = window.requestAnimationFrame(centerOwner);
-    window.addEventListener("resize", centerOwner);
-    return () => {
-      window.cancelAnimationFrame(frame);
-      window.removeEventListener("resize", centerOwner);
-    };
-  }, [active]);
-
-  useEffect(() => {
     const move = (event: PointerEvent) => {
       document.documentElement.style.setProperty("--mx", `${event.clientX}px`);
       document.documentElement.style.setProperty("--my", `${event.clientY}px`);
@@ -264,14 +238,6 @@ export default function Home() {
       document.documentElement.style.setProperty(
         "--tilt-y",
         `${(event.clientY / window.innerHeight - 0.5) * -14}deg`,
-      );
-      document.documentElement.style.setProperty(
-        "--team-tilt-x",
-        `${(event.clientX / window.innerWidth - 0.5) * 2.8}deg`,
-      );
-      document.documentElement.style.setProperty(
-        "--team-tilt-y",
-        `${(event.clientY / window.innerHeight - 0.5) * -2.8}deg`,
       );
     };
     window.addEventListener("pointermove", move, { passive: true });
@@ -342,21 +308,19 @@ export default function Home() {
     <main>
       <div aria-hidden="true" className="cursor-light" />
       <header className={`site-header ${!menuOpen && ["intro", "academy", "event-reels", "about", "contacts"].includes(active) ? "header-light" : "header-dark"}`}>
-        <button className="wordmark" onClick={() => goTo("intro")} aria-label="В начало">
+        <button className="wordmark" onClick={() => goTo("intro")} aria-label={t.common.home}>
           <span className="brand-mark" aria-hidden="true" />
           <span>LOGOGE</span>
         </button>
         <div className="header-center">
-          <span>{active === "intro" ? "Creative studio" : active.replace("-", " ")}</span>
+          <span>{active === "intro" ? t.common.marketingAgency : localizedDockItems[activeIndex]?.label}</span>
         </div>
         <div className="header-actions">
-          <a className="whatsapp-link" href={whatsapp} target="_blank" rel="noreferrer">
-            Try Now
-          </a>
+          <LanguageSwitch />
           <button
             className={`menu-toggle ${menuOpen ? "is-open" : ""}`}
             onClick={() => setMenuOpen((value) => !value)}
-            aria-label={menuOpen ? "Закрыть меню" : "Открыть меню"}
+            aria-label={menuOpen ? t.common.menuClose : t.common.menuOpen}
             aria-expanded={menuOpen}
           >
             <i />
@@ -367,44 +331,50 @@ export default function Home() {
 
       <nav
         className={`scene-dock ${["intro", "academy", "event-reels"].includes(active) ? "is-light" : ""} ${menuOpen || utilityScene ? "is-hidden" : ""}`}
-        aria-label="Навигация по разделам"
+        aria-label={t.common.sectionsNavigation}
         style={{ "--dock-progress": activeIndex / (dockItems.length - 1) } as CSSProperties}
       >
         <span className="dock-progress" aria-hidden="true" />
-        {dockItems.map((item, index) => (
+        {localizedDockItems.map((item, index) => (
           <button
             className={index === activeIndex ? "is-active" : ""}
             style={{ "--dock-position": `${(index / (dockItems.length - 1)) * 100}%` } as CSSProperties}
             onClick={() => goTo(item.id)}
-            aria-label={`Перейти: ${item.label}`}
+            aria-label={`${t.common.goTo}: ${item.label}`}
             aria-current={index === activeIndex ? "page" : undefined}
             key={item.id}
           >
             <span className="dock-marker" aria-hidden="true" />
+            <small>{item.description}</small>
           </button>
         ))}
       </nav>
 
       <nav className={`menu-overlay ${menuOpen ? "is-open" : ""}`} aria-hidden={!menuOpen}>
         <div className="menu-list">
-          {[
-            ["branding", "Услуги"],
-            ["about", "О компании"],
-            ["contacts", "Контакты"],
-          ].map(([id, label], index) => (
-            <button key={id} onClick={() => goTo(id)}>
-              <small>0{index + 1}</small>
-              {label}
+          <div className="menu-services">
+            <button onClick={() => setServicesOpen((value) => !value)} aria-expanded={servicesOpen}>
+              <small>01</small>{t.common.nav.services}
             </button>
-          ))}
-          <div className="menu-legal" aria-label="Юридическая информация">
-            <a href="/privacy">Политика конфиденциальности</a>
-            <a href="/cookies">Политика Cookie</a>
-            <a href="/terms">Пользовательское соглашение</a>
+            <div className={servicesOpen ? "service-links is-open" : "service-links"}>
+              <a href={`${homePath}#branding`} onClick={() => setMenuOpen(false)}>{t.common.services.branding}</a>
+              <a href={`${homePath}#smm`} onClick={() => setMenuOpen(false)}>SMM</a>
+              <a href={`${homePath}#academy`} onClick={() => setMenuOpen(false)}>{t.common.services.academy}</a>
+              <a href={`${homePath}#event-reels`} onClick={() => setMenuOpen(false)}>Event Reels</a>
+              <a href={`${homePath}#web`} onClick={() => setMenuOpen(false)}>Web Development</a>
+            </div>
+          </div>
+          <button onClick={() => goTo("about")}><small>02</small>{t.common.nav.about}</button>
+          <a className="menu-main-link" href={pagePath("/we")}><small>03</small>{t.common.nav.we}</a>
+          <button onClick={() => goTo("contacts")}><small>04</small>{t.common.nav.contacts}</button>
+          <div className="menu-legal" aria-label={t.common.legal.label}>
+            <a href={pagePath("/privacy")}>{t.common.legal.privacy}</a>
+            <a href={pagePath("/cookies")}>{t.common.legal.cookies}</a>
+            <a href={pagePath("/terms")}>{t.common.legal.terms}</a>
           </div>
         </div>
         <div className="menu-meta">
-          <span>RU · GE · EN</span>
+          <span>GE · RU · EN</span>
         </div>
       </nav>
 
@@ -418,17 +388,17 @@ export default function Home() {
           <div className="grain" />
         </div>
         <div className="hero-copy">
-          <p className="eyebrow">Branding · Marketing · Digital</p>
-          <h1>Там, где идея<br />становится <em>брендом</em></h1>
+          <p className="eyebrow">{t.home.labels.hero}</p>
+          <h1>{t.home.hero.sloganTop}<br /><em>{t.home.hero.sloganAccent}</em></h1>
+          <a className="hero-about" href={pagePath("/we")}>{t.home.hero.about} <i className="ui-arrow" aria-hidden="true" /></a>
         </div>
         <p className="hero-note">
-          Создаём бренды, контент и цифровые решения для бизнеса в Грузии и за её пределами.
+          {t.home.hero.note}
         </p>
         <button className="scroll-cue" onClick={() => goTo("branding")}>
-          <span>Прокрутите</span>
+          <span>{t.home.hero.scroll}</span>
           <b><i className="ui-arrow ui-arrow-down" aria-hidden="true" /></b>
         </button>
-        <div className="hero-counter">01 / 07</div>
       </section>
 
       <section className={sceneClass("branding", "service-scene branding")} id="branding">
@@ -436,23 +406,16 @@ export default function Home() {
         <div className="brand-orbits" aria-hidden="true"><i /><i /><b /></div>
         <div className="scene-number">02</div>
         <div className="section-copy">
-          <p className="eyebrow">Identity / Packaging / Print</p>
-          <h2>Branding</h2>
-          <p className="lead">Создаём цельную визуальную систему, которая превращает бизнес в узнаваемый бренд.</p>
+          <p className="eyebrow">{t.home.labels.branding}</p>
+          <h2>{t.home.branding.title}</h2>
+          <p className="lead">{t.home.branding.description}</p>
           <div className="tag-list">
-            {[
-              "Логотип",
-              "Идентичность",
-              "Цветовая система",
-              "Типографика",
-              "Печатные материалы",
-              "Упаковка",
-            ].map((tag, index) => <span style={{ "--tag-index": index } as CSSProperties} key={tag}><small>0{index + 1}</small>{tag}</span>)}
+            {t.home.branding.tags.map((tag, index) => <span style={{ "--tag-index": index } as CSSProperties} key={tag}><small>0{index + 1}</small>{tag}</span>)}
           </div>
         </div>
-        <p className="brand-side-note" aria-hidden="true">LOGO · COLOR · TYPE · FORM</p>
+        <p className="brand-side-note" aria-hidden="true">{t.home.labels.brandSide}</p>
         <SectionObject type="magazine" />
-        <a className="round-cta brand-cta magnetic" href={whatsapp} target="_blank" rel="noreferrer"><span>Обсудить<br />бренд</span><i className="ui-arrow" aria-hidden="true" /></a>
+        <a className="text-cta academy-cta brand-cta aligned-service-cta magnetic" href={localizedWhatsapp} target="_blank" rel="noreferrer">{t.home.branding.cta}</a>
       </section>
 
       <section className={sceneClass("smm", "service-scene smm")} id="smm">
@@ -461,128 +424,88 @@ export default function Home() {
         </div>
         <div className="scene-number">03</div>
         <div className="section-heading">
-          <p className="eyebrow">Strategy / Content / Performance</p>
+          <p className="eyebrow">{t.home.labels.smm}</p>
           <h2>SMM</h2>
-          <p>Продвижение, которое говорит голосом вашего бренда.</p>
+          <p>{t.home.smm.description}</p>
         </div>
-        <PackageCards items={smmPackages} service="SMM" destination="/smm" />
+        <PackageCards items={t.home.smm.packages} service="SMM" destination={pagePath("/smm")} moreLabel={t.home.ariaPackageMore} chooseLabel={t.home.ariaPackageChoose} />
         <SectionObject type="camera" />
-        <a className="text-cta smm-more" href="/smm">Подробнее / More</a>
+        <a className="text-cta smm-more" href={pagePath("/smm")}>{t.home.smm.more}</a>
       </section>
 
       <section className={sceneClass("academy", "service-scene academy")} id="academy">
-        <div className="academy-architecture" aria-hidden="true"><i /><i /><i /><span>LEARN · CREATE · GROW</span></div>
+        <div className="academy-architecture" aria-hidden="true"><i /><i /><i /><span>{t.home.labels.academyOrbit}</span></div>
         <div className="scene-number">04</div>
         <div className="section-heading">
-          <p className="eyebrow">Online & Offline · Georgia</p>
-          <h2>Academy</h2>
-          <p>Практические знания для самостоятельного создания контента и продвижения брендов.</p>
-        </div>
-        <div className="academy-focus" aria-label="Принципы Academy">
-          <span><small>01</small> Практика</span>
-          <span><small>02</small> Система</span>
-          <span><small>03</small> Результат</span>
+          <p className="eyebrow">{t.home.labels.academy}</p>
+          <h2>{t.home.academy.title}</h2>
+          <div className="academy-focus" aria-label={t.home.academy.principles}>
+            {t.home.academy.focuses.map((focus) => <span key={focus}>{focus}</span>)}
+          </div>
+          <p>{t.home.academy.description}</p>
         </div>
         <SectionObject type="cap" />
-        <a className="text-cta academy-cta" href="/academy/apply">Оставить заявку на обучение <b><i className="ui-arrow" aria-hidden="true" /></b></a>
+        <a className="text-cta academy-cta aligned-service-cta" href={pagePath("/academy/apply")}>{t.home.academy.cta} <b><i className="ui-arrow" aria-hidden="true" /></b></a>
       </section>
 
       <section className={sceneClass("event-reels", "service-scene event")} id="event-reels">
         <div className="scene-number">05</div>
         <div className="section-heading event-heading">
-          <p className="eyebrow">Real moments / Cinematic rhythm</p>
-          <h2>Event<br /><em>Reels</em></h2>
-          <p>Ловим эмоции события и превращаем их в динамичные Reels.</p>
+          <p className="eyebrow">{t.home.labels.event}</p>
+          <h2>Event <em>Reels</em></h2>
+          <p>{t.home.event.description}</p>
         </div>
-        <PackageCards items={eventPackages} service="Event Reels" />
         <SectionObject type="phone" />
+        <a className="text-cta academy-cta event-cta" href="https://www.instagram.com/eventreels.ge" target="_blank" rel="noreferrer">{t.home.event.cta}</a>
         <div className="event-includes">
-          Съёмка · трендовый монтаж · Stories в день события · обработка · исходники
+          {t.home.event.includes}
         </div>
       </section>
 
       <section className={sceneClass("web", "service-scene web")} id="web">
         <div className="scene-number">06</div>
         <div className="section-heading">
-          <p className="eyebrow">Design / Motion / Development</p>
+          <p className="eyebrow">{t.home.labels.web}</p>
           <h2>Web<br />Development</h2>
-          <p>Сайты с характером бренда — выразительные, быстрые и удобные на любом экране.</p>
+          <p>{t.home.web.description}</p>
         </div>
         <SectionObject type="laptop" />
-        <a className="web-cta magnetic" href="/contacts?service=Web%20Development">Начни<br />свой проект <b><i className="ui-arrow" aria-hidden="true" /></b></a>
-      </section>
-
-      <section className={sceneClass("team", "service-scene team")} id="team">
-        <div className="scene-number">07</div>
-        <div className="section-copy team-copy">
-          <p className="eyebrow">People behind the ideas</p>
-          <h2>Team</h2>
-          <p className="lead">Стратеги, дизайнеры и создатели контента, которые превращают идеи в узнаваемые истории.</p>
-          <div className="team-caption"><span>05</span> человек · одна творческая система</div>
-        </div>
-        <div className="team-gallery" ref={teamGalleryRef}>
-          <figure className="member-card owner-card">
-            <img src="/assets/team-mariana.jpg" alt="Mariana — команда LOGOGE" />
-            <figcaption><span>Mariana</span></figcaption>
-          </figure>
-          <figure className="member-card member-two">
-            <img src="/assets/team-amanda.jpg" alt="Amanda — команда LOGOGE" />
-            <figcaption><span>Amanda</span></figcaption>
-          </figure>
-          <figure className="member-card member-three">
-            <img src="/assets/team-asy.jpg" alt="Asy — команда LOGOGE" />
-            <figcaption><span>Asy</span></figcaption>
-          </figure>
-          <figure className="member-card member-four">
-            <img src="/assets/team-sophi.jpg" alt="Sofia — команда LOGOGE" />
-            <figcaption><span>Sofia</span></figcaption>
-          </figure>
-          <figure className="member-card member-five">
-            <img src="/assets/team-sveta.jpg" alt="Sveta — команда LOGOGE" />
-            <figcaption><span>Sveta</span></figcaption>
-          </figure>
-        </div>
-        <div className="game-teaser" aria-label="Будущая интерактивная игра">
-          <div className="case-handle" />
-          <div className="case-lid"><span>LOGOGE</span></div>
-          <div className="case-body"><span>Creative<br />toolkit</span></div>
-          <p>Interactive game · soon</p>
-        </div>
+        <a className="text-cta academy-cta web-cta magnetic" href={`${pagePath("/contacts")}?service=Web%20Development`}>{t.home.web.cta}</a>
       </section>
 
       <section className={`content-section utility-scene about-section ${active === "about" ? "is-active" : ""}`} id="about">
-        <p className="eyebrow">О компании</p>
-        <h2>Создаём визуальный язык, который помогает бизнесу расти.</h2>
+        <p className="eyebrow">{t.home.about.eyebrow}</p>
+        <h2>{t.home.about.title}</h2>
         <div className="about-grid">
-          <p>Объединяем стратегию, брендинг, контент и веб-дизайн в единую систему.</p>
-          <p>Работаем с компаниями и личными брендами в Грузии и за её пределами.</p>
+          <p>{t.home.about.p1}</p>
+          <p>{t.home.about.p2}</p>
         </div>
       </section>
 
       <footer className={`content-section utility-scene contact-section ${active === "contacts" ? "is-active" : ""}`} id="contacts">
         <div className="contact-layout">
           <div className="contact-copy">
-            <p className="eyebrow">Контакты · LOGOGE</p>
-            <h2>Обсудим<br /><em>вашу идею.</em></h2>
-            <p className="contact-note">Расскажите о задаче — мы предложим подходящий формат работы.</p>
-            <a className="contact-button magnetic" href={whatsapp} target="_blank" rel="noreferrer">Написать в WhatsApp <span className="ui-arrow" aria-hidden="true" /></a>
+            <p className="eyebrow">{t.home.contacts.eyebrow}</p>
+            <h2>{t.home.contacts.title}<br /><em>{t.home.contacts.titleAccent}</em></h2>
+            <p className="contact-note">{t.home.contacts.note}</p>
+            <a className="contact-button magnetic" href={localizedWhatsapp} target="_blank" rel="noreferrer">{t.home.contacts.whatsapp} <span className="ui-arrow" aria-hidden="true" /></a>
             <div className="contact-details">
-              <a href="tel:+995550001182"><small>Телефон</small><span>+995 550 00 11 82</span></a>
+              <a href="tel:+995550001182"><small>{t.home.contacts.phone}</small><span>+995 550 00 11 82</span></a>
               <a href="mailto:info.logoge@gmail.com"><small>Email</small><span>info.logoge@gmail.com</span></a>
               <div className="contact-socials">
-                <small>Социальные сети</small>
+                <small>{t.home.contacts.socials}</small>
                 <span className="social-links"><a href="https://www.instagram.com/logoge.marketing" target="_blank" rel="noreferrer"><i>◎</i>Instagram</a><a href="https://www.facebook.com/share/1EWu7wu7zo/" target="_blank" rel="noreferrer"><i>f</i>Facebook</a></span>
               </div>
             </div>
           </div>
           <div className="contact-visual" aria-hidden="true">
-            <span>IDEA<br />TO<br />IMPACT</span>
-            <small>Branding · Marketing · Digital</small>
+            <span>{t.home.labels.contactVisual.split("\n").map((line, index) => <span key={line}>{index > 0 && <br />}{line}</span>)}</span>
+            <small>{t.home.labels.hero}</small>
           </div>
         </div>
         <div className="contact-footer">
-          <div className="partners-strip"><span>Партнёры</span><b>Список обновляется</b></div>
-          <div className="footer-line"><span>© 2026 LOGOGE</span><span>Vazisubani 2/10 · Tbilisi</span><span>RU · GE · EN</span></div>
+          <div className="partners-strip"><span>{t.home.contacts.partners}</span><b>{t.home.contacts.updating}</b></div>
+          <div className="footer-line"><span>© 2026 LOGOGE</span><span>Vazisubani 2/10 · Tbilisi</span><span>GE · RU · EN</span></div>
         </div>
       </footer>
     </main>
