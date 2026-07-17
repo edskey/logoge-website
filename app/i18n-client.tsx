@@ -8,6 +8,15 @@ const languageStorageKey = "logoge-language";
 type LanguageContextValue = { locale: Locale; changeLocale: (next: Locale) => void };
 const LanguageContext = createContext<LanguageContextValue | null>(null);
 
+function localeFromBrowser(): Locale {
+  const browserLanguages = navigator.languages?.length ? navigator.languages : [navigator.language];
+  for (const browserLanguage of browserLanguages) {
+    const language = browserLanguage.toLowerCase().split("-")[0];
+    if (language === "ka" || language === "ru" || language === "en") return language;
+  }
+  return "ka";
+}
+
 function applyDocumentLocale(locale: Locale) {
   document.documentElement.lang = locale;
   document.documentElement.dataset.locale = locale;
@@ -33,7 +42,10 @@ export function LanguageProvider({ initialLocale, children }: { initialLocale: L
     const saved = window.localStorage.getItem(languageStorageKey);
     const savedLocale = saved === "ka" || saved === "ru" || saved === "en" ? saved : null;
     const hasExplicitLocale = /^\/(ru|en)(?=\/|$)/.test(window.location.pathname);
-    if (!hasExplicitLocale && savedLocale && savedLocale !== locale) setLocale(savedLocale);
+    if (!hasExplicitLocale) {
+      const preferredLocale = savedLocale ?? localeFromBrowser();
+      if (preferredLocale !== locale) setLocale(preferredLocale);
+    }
     applyDocumentLocale(locale);
   }, [locale]);
 

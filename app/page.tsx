@@ -76,7 +76,7 @@ function SectionObject({ type }: { type: "magazine" | "camera" | "cap" | "phone"
   );
 }
 
-function HeroVideo({ src, className, poster }: { src: string; className: string; poster?: string }) {
+function HeroVideo({ src, mobileSrc, className, poster }: { src: string; mobileSrc?: string; className: string; poster?: string }) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -99,6 +99,7 @@ function HeroVideo({ src, className, poster }: { src: string; className: string;
       poster={poster}
       disablePictureInPicture
     >
+      {mobileSrc && <source src={mobileSrc} media="(max-width: 899px)" type="video/mp4" />}
       <source src={src} type="video/mp4" />
     </video>
   );
@@ -380,7 +381,7 @@ export default function Home() {
 
       <section className={sceneClass("intro", "hero")} id="intro">
         <div className="hero-art" aria-hidden="true">
-          <HeroVideo src="/assets/hero-video-3.mp4" className="hero-video" poster="/assets/hero-hq.png" />
+          <HeroVideo src="/assets/hero-video-3.mp4" mobileSrc="/assets/hero-video-3-mobile.mp4" className="hero-video" poster="/assets/hero-hq.png" />
           <div className="liquid liquid-one" />
           <div className="liquid liquid-two" />
           <div className="halo" />

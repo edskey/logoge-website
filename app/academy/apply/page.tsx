@@ -1,7 +1,8 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useCallback, useState } from "react";
 import { LanguageSwitch } from "../../components/language-switch";
+import { Turnstile } from "../../components/turnstile";
 import { getTranslations, localizedPath } from "../../i18n";
 import { useLocale } from "../../i18n-client";
 
@@ -15,9 +16,25 @@ export default function AcademyApplyPage() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [consent, setConsent] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState(false);
+  const turnstileEnabled = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
+  const onTurnstileToken = useCallback((token: string | null) => {
+    setTurnstileToken(token);
+    if (token) setSubmitError(false);
+  }, []);
 
-  const submitApplication = (event: FormEvent<HTMLFormElement>) => {
+  const submitApplication = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (turnstileEnabled) {
+      if (!turnstileToken) { setSubmitError(true); return; }
+      const response = await fetch("/api/turnstile", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ token: turnstileToken }),
+      });
+      if (!response.ok) { setSubmitError(true); return; }
+    }
     const message = [
       a.whatsapp,
       `${a.whatsappName}: ${name.trim()}`,
@@ -66,6 +83,8 @@ export default function AcademyApplyPage() {
             <input type="checkbox" name="privacy-consent" checked={consent} onChange={(event) => setConsent(event.target.checked)} required />
             <span>{a.consent} <a href={localizedPath(locale, "/privacy")} target="_blank" rel="noreferrer">{a.consentLink}</a>{a.consentAfter}</span>
           </label>
+          <Turnstile onToken={onTurnstileToken} />
+          {submitError && <p className="turnstile-error" role="alert">{a.captchaError}</p>}
           <button type="submit"><span>{a.submit}</span><b><i className="ui-arrow" aria-hidden="true" /></b></button>
           <p>{a.after}</p>
         </form>
